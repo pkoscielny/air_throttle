@@ -1,3 +1,14 @@
+/*
+ * IDE: Arduino IDE 1.8.13.
+ * Board: SparkFun Pro Micro.
+ *  
+ * Hardware:
+ * - SparkFun Pro Micro 5V 16MHz board.
+ * - stepper motor 28BYJ-48 with ULN2003 driver.
+ * - hall sensor ACS712 20A.
+ * - 0.96" OLED display.
+*/
+
 #include <ACS712.h>
 #include <Stepper.h>
 #include <Adafruit_SSD1306.h>
@@ -12,6 +23,9 @@ const int steps = 32;             // the number of motor steps.
 const int rotate_360 = 2048;      // 32*64 - because of gear.
 Stepper motor(steps, 6, 8, 7, 9); // pay attention to pins order. Current order is proper.
 
+// Device current threshlod.
+const int current_threshold = 200; // mA.
+
 // HALL effect sensor.
 // SparFun has 5.0 volt with a max value of 1023 steps.
 // ACS712 5A  uses 185 mV per A.
@@ -25,7 +39,6 @@ void setup() {
   motor.setSpeed(800);
 
   // Init HALL sensor.
-  //pinMode(A0, INPUT);
   acs.autoMidPoint();
 
   // Init and clear OLED display.
@@ -36,7 +49,7 @@ void setup() {
 }
 
 
-bool is_stove_running   = false;
+bool is_device_running  = false;
 bool is_throttle_opened = false;
 int mA; // the value taken from Hall sensor (in miliampers).
 
@@ -46,16 +59,16 @@ void loop() {
   display_hall(mA, is_throttle_opened);
   //Serial.println(mA);
 
-  // Stove is running.
-  is_stove_running = (mA > 200) ? true : false; 
+  // Some device is running.
+  is_device_running = (mA > current_threshold) ? true : false; 
 
   // Run motor if needed.
-  if (is_stove_running && !is_throttle_opened) {
+  if (is_device_running && !is_throttle_opened) {
     display_throttle_state("opening...");
     open_throttle(motor);
     is_throttle_opened = true;
   } 
-  else if (!is_stove_running && is_throttle_opened) {
+  else if (!is_device_running && is_throttle_opened) {
     display_throttle_state("closing...");
     close_throttle(motor);
     is_throttle_opened = false;
