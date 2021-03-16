@@ -11,7 +11,7 @@
 #include <ACS712.h>
 #include <Stepper.h>
 
-// Motor.
+// Motor settings.
 const int steps = 32;             // the number of motor steps.
 const int rotate_360 = 2048;      // 32*64 - because of gear.
 Stepper motor(steps, 6, 8, 7, 9); // pay attention to pins order. Current order is proper.

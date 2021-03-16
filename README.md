@@ -15,3 +15,6 @@ A Hall-effect sensor detects when the device is running.
 * Hall-effect sensor ACS712 20A
 * simple ventilation throttle valve
 * 0.96" OLED display (optionally)
+
+### Breadboard circuit diagram
+![circuit](/fz/air_throttle.png)
